@@ -19,11 +19,11 @@ AI workloads introduce new platform risks: GPU cost spikes, unclear model owners
 
 ```mermaid
 flowchart LR
-    A["AI Workload Request"] --> B["Classification<br/>data, model, owner, environment"]
-    B --> C["Policy Controls<br/>isolation, access, quotas, provenance"]
-    C --> D["Deployment<br/>GitOps, approval, rollback"]
-    D --> E["Observability<br/>cost, latency, usage, drift signals"]
-    E --> F["Executive Dashboard<br/>risk, spend, adoption, exceptions"]
+    A["AI Workload Request"] --> B["Classification<br/>data model owner environment"]
+    B --> C["Policy Controls<br/>isolation access quotas provenance"]
+    C --> D["Deployment<br/>GitOps approval rollback"]
+    D --> E["Observability<br/>cost latency usage drift signals"]
+    E --> F["Executive Dashboard<br/>risk spend adoption exceptions"]
 ```
 
 ## GPU Cost Governance

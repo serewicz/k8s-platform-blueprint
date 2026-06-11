@@ -13,7 +13,7 @@ flowchart LR
     A["Diligence Finding"] --> B["Business Risk"]
     B --> C["Platform Control"]
     C --> D["Evidence Package"]
-    D --> E["Board / Operating Partner Review"]
+    D --> E["Board and Operating Partner Review"]
 ```
 
 ## Finding-to-Control Mapping

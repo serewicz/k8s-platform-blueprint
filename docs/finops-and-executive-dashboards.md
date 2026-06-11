@@ -36,10 +36,10 @@ Minimum required labels:
 
 ```mermaid
 flowchart LR
-    A["Cloud Billing"] --> C["Cost Allocation Engine<br/>OpenCost / Kubecost"]
+    A["Cloud Billing"] --> C["Cost Allocation Engine<br/>OpenCost or Kubecost"]
     B["Kubernetes Metadata<br/>labels, namespaces, workloads"] --> C
-    C --> D["Team / Product Cost"]
-    C --> E["Customer / Tenant Cost"]
+    C --> D["Team and Product Cost"]
+    C --> E["Customer and Tenant Cost"]
     C --> F["Environment Cost"]
     D --> G["Executive Dashboard"]
     E --> G

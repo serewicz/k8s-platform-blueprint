@@ -13,7 +13,7 @@ flowchart LR
     L1["Level 1<br/>Basic Kubernetes"] --> L2["Level 2<br/>Managed Platform"]
     L2 --> L3["Level 3<br/>Governed Platform"]
     L3 --> L4["Level 4<br/>Enterprise Platform"]
-    L4 --> L5["Level 5<br/>Board-Ready Platform"]
+    L4 --> L5["Level 5<br/>Board Ready Platform"]
 ```
 
 ## Level 1: Basic Kubernetes

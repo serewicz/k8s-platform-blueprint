@@ -28,34 +28,38 @@ All components are deployed via GitOps manifests in `manifests/` and configured 
 
 ```mermaid
 flowchart TB
-    subgraph "Applications & Platform"
-        Apps[Workloads + Sidecars<br/>OTel SDKs]
-        K8s[Kubernetes Components]
+    subgraph "Applications and Platform"
+        Apps["Workloads and Sidecars<br/>OpenTelemetry SDKs"]
+        K8s["Kubernetes Components"]
     end
 
     subgraph "Collection"
-        OTEL[OpenTelemetry Collector<br/>(DaemonSet + Deployment)]
-        Prom[Prometheus + kube-state-metrics<br/>+ node-exporter + cadvisor]
-        Promtail[Promtail / Alloy]
+        OTEL["OpenTelemetry Collector<br/>DaemonSet and Deployment"]
+        Prom["Prometheus kube state metrics<br/>node exporter cadvisor"]
+        Promtail["Promtail or Alloy"]
     end
 
-    subgraph "Storage & Processing"
-        PromDB[(Prometheus / Thanos)]
-        LokiDB[(Loki)]
-        TraceDB[(Tempo / Jaeger)]
+    subgraph "Storage and Processing"
+        PromDB[("Prometheus or Thanos")]
+        LokiDB[("Loki")]
+        TraceDB[("Tempo or Jaeger")]
     end
 
-    subgraph "Presentation & Action"
-        Graf[Grafana<br/>(Core + CTO folders)]
-        Alert[Alertmanager]
-        Reports[Compliance & Cost Reports]
+    subgraph "Presentation and Action"
+        Graf["Grafana<br/>Core and CTO folders"]
+        Alert["Alertmanager"]
+        Reports["Compliance and Cost Reports"]
     end
 
     Apps --> OTEL
-    K8s --> Prom & Promtail
-    OTEL --> PromDB & TraceDB
+    K8s --> Prom
+    K8s --> Promtail
+    OTEL --> PromDB
+    OTEL --> TraceDB
     Promtail --> LokiDB
-    PromDB & LokiDB & TraceDB --> Graf
+    PromDB --> Graf
+    LokiDB --> Graf
+    TraceDB --> Graf
     PromDB --> Alert
     Graf --> Reports
 ```

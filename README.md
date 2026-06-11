@@ -89,9 +89,9 @@ The governance goal is not more bureaucracy. The goal is to make ownership, trad
 
 ```mermaid
 flowchart LR
-    A["Platform Inputs<br/>Workloads, teams, spend, risk"] --> B["Governance Controls<br/>GitOps, policy, labels, RBAC"]
-    B --> C["Operational Evidence<br/>cost reports, policy reports, logs, SLOs"]
-    C --> D["Executive Decisions<br/>investment, risk, roadmap, accountability"]
+    A["Platform Inputs<br/>Workloads teams spend risk"] --> B["Governance Controls<br/>GitOps policy labels RBAC"]
+    B --> C["Operational Evidence<br/>cost reports policy reports logs SLOs"]
+    C --> D["Executive Decisions<br/>investment risk roadmap accountability"]
 ```
 
 ---
@@ -101,39 +101,39 @@ flowchart LR
 ```mermaid
 flowchart TB
     subgraph "Business Layer"
-        B1[CTOs / Executives<br/>ROI, Risk, SLAs]
-        B2[Platform Team]
+        B1["CTOs and Executives<br/>ROI Risk SLAs"]
+        B2["Platform Team"]
     end
 
-    subgraph "Control & Governance Layer"
-        G1[Kyverno / OPA Gatekeeper<br/>Policy-as-Code]
-        G2[RBAC + NetworkPolicies + Audit]
-        G3[GitOps: Flux / Argo CD]
+    subgraph "Control and Governance Layer"
+        G1["Kyverno and OPA Gatekeeper<br/>Policy as Code"]
+        G2["RBAC NetworkPolicies Audit"]
+        G3["GitOps<br/>Flux or Argo CD"]
     end
 
     subgraph "Platform Control Plane"
-        P1[Multi-Cluster Management]
-        P2[Karpenter + Cluster Autoscaler<br/>Spot / Right-sizing]
-        P3[OpenCost + Kubecost-like<br/>FinOps & Chargeback]
+        P1["Multi Cluster Management"]
+        P2["Karpenter and Cluster Autoscaler<br/>Spot and Right Sizing"]
+        P3["OpenCost and Kubecost Patterns<br/>FinOps and Chargeback"]
     end
 
     subgraph "Observability Stack"
-        O1[Prometheus + Grafana + Loki]
-        O2[OpenTelemetry + Jaeger]
-        O3[Alertmanager + CTO Dashboards]
+        O1["Prometheus Grafana Loki"]
+        O2["OpenTelemetry Jaeger"]
+        O3["Alertmanager CTO Dashboards"]
     end
 
-    subgraph "Workload & Data Plane"
-        W1[Applications (Learner Platforms, APIs, Jobs)]
-        W2[Service Mesh (Istio / Linkerd optional)]
-        W3[Namespaces with Quotas & Cost Allocation]
+    subgraph "Workload and Data Plane"
+        W1["Applications<br/>Learner Platforms APIs Jobs"]
+        W2["Service Mesh<br/>Istio or Linkerd Optional"]
+        W3["Namespaces with Quotas and Cost Allocation"]
     end
 
-    subgraph "Infrastructure (Multi-Cloud + Hybrid)"
-        I1[AWS EKS]
-        I2[GCP GKE]
-        I3[Azure AKS]
-        I4[On-Prem / VMware / Bare Metal]
+    subgraph "Infrastructure Multi Cloud Hybrid"
+        I1["AWS EKS"]
+        I2["GCP GKE"]
+        I3["Azure AKS"]
+        I4["On Prem VMware Bare Metal"]
     end
 
     B1 --> G1
@@ -141,10 +141,16 @@ flowchart TB
     G1 --> P1
     G3 --> P1
     P1 --> W1
-    P2 --> I1 & I2 & I3
+    P2 --> I1
+    P2 --> I2
+    P2 --> I3
     P3 --> O1
-    O1 & O2 --> O3
-    W1 --> I1 & I2 & I3 & I4
+    O1 --> O3
+    O2 --> O3
+    W1 --> I1
+    W1 --> I2
+    W1 --> I3
+    W1 --> I4
     G2 --> W1
 ```
 

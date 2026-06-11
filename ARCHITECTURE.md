@@ -44,59 +44,69 @@ The platform follows a layered, defense-in-depth model designed for executive ov
 
 ```mermaid
 flowchart TB
-    subgraph "Business & Executive Layer"
-        Exec[CTOs / Board / Platform Governance<br/>ROI, Risk Heatmaps, SLA Burn, Unit Economics]
-        Strategy[Strategic Decisions<br/>Investment, Risk Appetite, Compliance Scope]
+    subgraph "Business and Executive Layer"
+        Exec["CTOs Board Platform Governance<br/>ROI Risk Heatmaps SLA Burn Unit Economics"]
+        Strategy["Strategic Decisions<br/>Investment Risk Appetite Compliance Scope"]
     end
 
-    subgraph "Governance & Supply Chain Layer (SLSA + CRA)"
-        GitOps[GitOps Controller<br/>Flux / Argo CD<br/>Single Source of Truth + Drift Detection]
-        PolicyEngine[Policy-as-Code Engine<br/>Kyverno (primary) + Gatekeeper<br/>Admission + Mutation + Reports]
-        SupplyChain[Supply Chain Controls<br/>Cosign Signing + SLSA Provenance<br/>SBOMs + Image Freshness + Registry Policy]
-        IAM[Identity, RBAC & Break-Glass<br/>Least Privilege + Just-in-Time + Audit]
+    subgraph "Governance and Supply Chain Layer"
+        GitOps["GitOps Controller<br/>Flux or Argo CD<br/>Single Source of Truth and Drift Detection"]
+        PolicyEngine["Policy as Code Engine<br/>Kyverno primary and Gatekeeper<br/>Admission Mutation Reports"]
+        SupplyChain["Supply Chain Controls<br/>Cosign Signing and SLSA Provenance<br/>SBOMs Image Freshness Registry Policy"]
+        IAM["Identity RBAC Break Glass<br/>Least Privilege Just in Time Audit"]
     end
 
     subgraph "Platform Control Plane Services"
-        FinOps[Cost & FinOps<br/>OpenCost + Kubecost-like<br/>Allocation Labels + Chargeback + Budgets<br/>Spot/Right-sizing ROI]
-        Autoscaling[Karpenter + HPA/VPA<br/>Cluster + Workload Autoscaling<br/>Consolidation + Predictive]
-        Connectivity[Connectivity & Service Mesh (opt)<br/>Cilium / Calico NP + Istio/Linkerd<br/>Multi-cluster East-West]
+        FinOps["Cost and FinOps<br/>OpenCost and Kubecost Patterns<br/>Allocation Labels Chargeback Budgets<br/>Spot Right Sizing ROI"]
+        Autoscaling["Karpenter HPA VPA<br/>Cluster and Workload Autoscaling<br/>Consolidation and Predictive Scaling"]
+        Connectivity["Connectivity and Service Mesh<br/>Cilium Calico Istio Linkerd<br/>Multi Cluster East West"]
     end
 
-    subgraph "Observability & Feedback Loop"
-        Metrics[Metrics<br/>Prometheus + Thanos / VM]
-        LogsTraces[Logs + Traces<br/>Loki + Tempo/OTel + Jaeger]
-        Dashboards[Grafana<br/>Operator Dashboards +<br/>CTO Executive Folder (ROI, Risk, SLA)]
-        Alerting[Alertmanager + Runbooks<br/>Business-Impact + Error Budget Alerts]
+    subgraph "Observability and Feedback Loop"
+        Metrics["Metrics<br/>Prometheus Thanos VictoriaMetrics"]
+        LogsTraces["Logs and Traces<br/>Loki Tempo OpenTelemetry Jaeger"]
+        Dashboards["Grafana<br/>Operator Dashboards<br/>CTO Executive Folder"]
+        Alerting["Alertmanager and Runbooks<br/>Business Impact Error Budget Alerts"]
     end
 
-    subgraph "Workload / Data Plane (Tenant Namespaces)"
-        Workloads[Applications & Jobs<br/>Learner Platforms, APIs, Batch<br/>OTel Instrumentation]
-        Tenants[Namespace Tenants<br/>Quotas + Cost Labels + NetworkPolicies<br/>PDBs + Topology Spread]
+    subgraph "Workload and Data Plane"
+        Workloads["Applications and Jobs<br/>Learner Platforms APIs Batch<br/>OpenTelemetry Instrumentation"]
+        Tenants["Namespace Tenants<br/>Quotas Cost Labels NetworkPolicies<br/>PDBs Topology Spread"]
     end
 
-    subgraph "Infrastructure Layer (Multi-Cloud + Hybrid)"
-        Cloud1[AWS EKS<br/>+ CUR Billing + IRSA]
-        Cloud2[GCP GKE<br/>+ Billing Export + WI]
-        Cloud3[Azure AKS<br/>+ Cost Mgmt + WI]
-        OnPrem[On-Prem / VMware / Edge<br/>CAPI or Talos + Static Cost Model]
-        Net[Cross-Cloud Connectivity<br/>Transit Gateway / Interconnect / VPN / Submariner]
+    subgraph "Infrastructure Layer Multi Cloud Hybrid"
+        Cloud1["AWS EKS<br/>CUR Billing IRSA"]
+        Cloud2["GCP GKE<br/>Billing Export Workload Identity"]
+        Cloud3["Azure AKS<br/>Cost Management Workload Identity"]
+        OnPrem["On Prem VMware Edge<br/>CAPI or Talos Static Cost Model"]
+        Net["Cross Cloud Connectivity<br/>Transit Gateway Interconnect VPN Submariner"]
     end
 
     %% Flows
     Strategy --> GitOps
     Exec --> Dashboards
-    GitOps -->|Desired State| PolicyEngine
-    PolicyEngine -->|Mutate / Validate / Deny| Cloud1 & Cloud2 & Cloud3 & OnPrem
+    GitOps -->|"Desired State"| PolicyEngine
+    PolicyEngine -->|"Mutate Validate Deny"| Cloud1
+    PolicyEngine -->|"Mutate Validate Deny"| Cloud2
+    PolicyEngine -->|"Mutate Validate Deny"| Cloud3
+    PolicyEngine -->|"Mutate Validate Deny"| OnPrem
     SupplyChain --> PolicyEngine
     IAM --> PolicyEngine
     FinOps --> Dashboards
-    Autoscaling --> Cloud1 & Cloud2 & Cloud3
-    Metrics & LogsTraces --> Dashboards
+    Autoscaling --> Cloud1
+    Autoscaling --> Cloud2
+    Autoscaling --> Cloud3
+    Metrics --> Dashboards
+    LogsTraces --> Dashboards
     Alerting --> Exec
-    Workloads --> Metrics & LogsTraces
+    Workloads --> Metrics
+    Workloads --> LogsTraces
     Workloads --> Tenants
     Tenants --> PolicyEngine
-    Cloud1 & Cloud2 & Cloud3 & OnPrem --> Net
+    Cloud1 --> Net
+    Cloud2 --> Net
+    Cloud3 --> Net
+    OnPrem --> Net
     Net --> Workloads
 ```
 
@@ -118,7 +128,6 @@ This diagram (and the ADRs below) directly support EU CRA requirements for cyber
 - Observability that serves both operators and executives
 - Progressive disclosure + strong supply chain (SLSA) and regulatory alignment (including EU CRA)
 - Portability: simple local start (kind) → production multi-cluster / hybrid / regulated environments
-```
 
 **Key Data Flows** (legacy high-level, kept for reference):
 - Git → GitOps Controller → Desired State in all clusters
@@ -301,21 +310,21 @@ For the change + admission control flow, see this sequence:
 
 ```mermaid
 sequenceDiagram
-    participant Dev as Developer / CI
-    participant Git as Git Repo (signed commits)
-    participant GitOps as GitOps Controller (Flux/Argo)
-    participant Kyverno as Kyverno + Cosign/Sigstore
+    participant Dev as Developer CI
+    participant Git as Git Repo Signed Commits
+    participant GitOps as GitOps Controller
+    participant Kyverno as Kyverno Cosign Sigstore
     participant K8s as Kubernetes API
-    participant Audit as Audit / Evidence Store + PolicyReports
+    participant Audit as Audit Evidence Store PolicyReports
 
-    Dev->>Git: PR + signed commit (SLSA build provenance generated in CI)
-    Git->>GitOps: Reconcile loop (desired state)
-    GitOps->>K8s: Apply / Create resources
-    K8s->>Kyverno: Admission review (validate + image provenance check)
-    Kyverno->>Kyverno: Verify cosign signature + SLSA attestation (prod namespaces)
-    Kyverno->>K8s: Mutate (labels, defaults) or Deny
-    K8s->>Audit: Kubernetes audit events + Kyverno PolicyReport
-    Kyverno->>Audit: Structured compliance evidence (exportable via scripts)
+    Dev->>Git: PR and signed commit with SLSA provenance
+    Git->>GitOps: Reconcile desired state
+    GitOps->>K8s: Apply or create resources
+    K8s->>Kyverno: Admission review and provenance check
+    Kyverno->>Kyverno: Verify signature and attestation
+    Kyverno->>K8s: Mutate labels or deny
+    K8s->>Audit: Kubernetes audit events and PolicyReport
+    Kyverno->>Audit: Structured compliance evidence
 ```
 
 **Implemented Controls** (see `manifests/clusters/policies/kyverno/` and the new `verify-slsa-provenance.yaml`):
@@ -335,12 +344,12 @@ The architecture is explicitly designed so that the platform (and applications b
 
 ```mermaid
 flowchart LR
-    K8s[Kubernetes Clusters] -->|kube-state-metrics<br/>node-exporter| OC[OpenCost]
-    Cloud[AWS CUR / GCP Billing Export<br/>Azure Cost Mgmt] --> OC
-    OC -->|Prometheus metrics| Grafana
-    OC -->|CSV/JSON| Finance[Finance Systems / Chargeback]
-    Karpenter[Karpenter] -->|node decisions| K8s
-    VPA[VPA Recommendations] -->|right-size| Apps
+    K8s["Kubernetes Clusters"] -->|"kube state metrics and node exporter"| OC["OpenCost"]
+    Cloud["AWS CUR GCP Billing Export<br/>Azure Cost Management"] --> OC
+    OC -->|"Prometheus metrics"| Grafana["Grafana"]
+    OC -->|"CSV and JSON"| Finance["Finance Systems and Chargeback"]
+    Karpenter["Karpenter"] -->|"node decisions"| K8s
+    VPA["VPA Recommendations"] -->|"right size"| Apps["Applications"]
 ```
 
 - Allocation labels are **mandatory** (enforced by Kyverno).
