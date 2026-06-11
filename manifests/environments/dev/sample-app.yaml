@@ -1,0 +1,94 @@
+# manifests/environments/dev/sample-app.yaml
+# Lightweight sample application for local development and labs.
+# Represents a typical stateless learner-facing service.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-learner-api
+  labels:
+    app.kubernetes.io/name: sample-learner-api
+    app.kubernetes.io/component: api
+    cost-center: platform-dev
+    team: platform-engineering
+    product: learner-experience
+    environment: dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sample-learner-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sample-learner-api
+        app.kubernetes.io/component: api
+        cost-center: platform-dev
+        team: platform-engineering
+        product: learner-experience
+        environment: dev
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/your-org/sample-learner-api:v0.4.2   # Replace with real image
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: ENV
+              value: "dev"
+            - name: LOG_LEVEL
+              value: "debug"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-learner-api
+  labels:
+    app.kubernetes.io/name: sample-learner-api
+spec:
+  selector:
+    app.kubernetes.io/name: sample-learner-api
+  ports:
+    - port: 80
+      targetPort: 8080
+      name: http
+---
+# Simple HPA to demonstrate scaling in labs
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sample-learner-api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sample-learner-api
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60

@@ -1,0 +1,33 @@
+# manifests/clusters/policies/kyverno/pod-security-baseline.yaml
+# Applies a restricted pod security profile to application workloads.
+# Based on Kubernetes Pod Security Standards (restricted / baseline).
+#
+# Maps to SOC2 CC6.1, ISO27001 A.8.2 / A.8.3 controls.
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: pod-security-restricted
+  annotations:
+    policies.kyverno.io/title: Pod Security - Restricted Profile
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: high
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: restricted
+      match:
+        resources:
+          kinds:
+            - Pod
+          namespaces:
+            - "!kube-system"
+            - "!kyverno"
+            - "!platform-system"
+            - "!monitoring"
+      validate:
+        message: "Pod does not meet the restricted pod security standard."
+        podSecurity:
+          level: restricted
+          version: latest

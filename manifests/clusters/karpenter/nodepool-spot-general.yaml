@@ -1,0 +1,48 @@
+# manifests/clusters/karpenter/nodepool-spot-general.yaml
+# Karpenter NodePool for general-purpose spot capacity.
+# High consolidation, suitable for most stateless learner platform workloads.
+#
+# Expected savings: 40-70% vs on-demand depending on instance type and region.
+
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: spot-general
+  labels:
+    cost-center: platform-infra
+    team: platform-engineering
+spec:
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 10m
+    expireAfter: 168h   # 7 days - forces refresh for security patches
+  template:
+    metadata:
+      labels:
+        node.kubernetes.io/capacity-type: spot
+        node-pool: spot-general
+    spec:
+      requirements:
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["spot"]
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: ["c", "m", "r"]
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: ["2"]
+      nodeClassRef:
+        name: default
+      # Taints can be added for dedicated workloads
+      # taints:
+      #   - key: spot
+      #     value: "true"
+      #     effect: NoSchedule
+  limits:
+    cpu: "1000"   # Safety cap - adjust per cluster
+    memory: 4000Gi
+  weight: 10

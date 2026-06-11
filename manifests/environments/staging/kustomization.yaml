@@ -1,0 +1,20 @@
+# manifests/environments/staging/kustomization.yaml
+# Staging mirrors production closely but with smaller scale and relaxed spot ratios.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: staging-platform
+
+resources:
+  - ../base
+  - namespace.yaml
+  - sample-app.yaml
+  - quotas/staging-quotas.yaml
+
+commonLabels:
+  environment: staging
+
+commonAnnotations:
+  environment.platform.blueprint: "staging"
+  cost.platform.blueprint/budget-monthly: "6500"

@@ -1,0 +1,53 @@
+# manifests/clusters/policies/kyverno/require-cost-labels.yaml
+# Kyverno ClusterPolicy
+# Enforces mandatory cost allocation labels on all application pods.
+# This is foundational for OpenCost chargeback and executive dashboards.
+#
+# How this helps CTOs: Guarantees every workload is attributable to a cost center,
+# team, product, and environment. No more "unallocated" mystery spend.
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-cost-allocation-labels
+  annotations:
+    policies.kyverno.io/title: Require Cost Allocation Labels
+    policies.kyverno.io/category: Cost & FinOps
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: |
+      All pods in non-platform namespaces must carry:
+      - cost-center
+      - team
+      - product
+      - environment (dev|staging|prod)
+      Violations are blocked in production environments.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-cost-labels
+      match:
+        resources:
+          kinds:
+            - Pod
+          namespaces:
+            # Exclude platform and system namespaces
+            - "!platform-*"
+            - "!monitoring"
+            - "!kube-system"
+            - "!kube-public"
+            - "!kyverno"
+            - "!opencost"
+      validate:
+        message: |
+          Pod is missing required cost allocation labels.
+          Required: cost-center, team, product, environment (dev|staging|prod).
+          See: https://github.com/your-org/k8s-platform-blueprint/docs/cost-optimization-and-finops.md
+        pattern:
+          metadata:
+            labels:
+              cost-center: "?*"
+              team: "?*"
+              product: "?*"
+              environment: "dev | staging | prod"

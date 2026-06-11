@@ -1,0 +1,27 @@
+# manifests/clusters/policies/kyverno/require-owner-label.yaml
+# Ensures every workload has an owner/team for alerting and accountability.
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-owner-label
+  annotations:
+    policies.kyverno.io/title: Require Owner / Team Label
+    policies.kyverno.io/category: Operational Excellence
+    policies.kyverno.io/severity: medium
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: owner-label
+      match:
+        resources:
+          kinds: [Pod]
+          namespaces: ["!kube-system", "!kyverno", "!platform-system"]
+      validate:
+        message: "Workloads must have a 'team' or 'owner' label for on-call and accountability."
+        pattern:
+          metadata:
+            labels:
+              (team): "?*"
+              (owner): "?*"

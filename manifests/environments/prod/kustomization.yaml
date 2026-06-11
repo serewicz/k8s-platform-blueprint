@@ -1,0 +1,20 @@
+# manifests/environments/prod/kustomization.yaml
+# Production environment. Highest security posture, strict policies, full monitoring.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: prod-platform
+
+resources:
+  - ../base
+  - namespace.yaml
+  - sample-app.yaml
+  - quotas/prod-quotas.yaml
+
+commonLabels:
+  environment: prod
+
+commonAnnotations:
+  environment.platform.blueprint: "prod"
+  cost.platform.blueprint/budget-monthly: "18500"

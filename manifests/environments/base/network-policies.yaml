@@ -1,0 +1,17 @@
+# manifests/environments/base/network-policies.yaml
+# Default-deny network policy for application namespaces.
+# Application teams must create explicit allow rules for required traffic.
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  annotations:
+    description: "Default deny all ingress and egress. Create additional policies for allowed traffic."
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  # No ingress rules = deny all ingress from other pods
+  # No egress rules = deny all egress (except DNS is often allowed via CNI or separate policy)

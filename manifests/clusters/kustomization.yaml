@@ -1,0 +1,40 @@
+# manifests/clusters/kustomization.yaml
+# Root Kustomization for cluster-level platform components.
+# Apply this (or let Flux/Argo CD sync it) to install platform-wide primitives
+# that are not environment-specific.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # Core namespaces
+  - namespaces/platform-system.yaml
+  - namespaces/monitoring.yaml
+  - namespaces/opencost.yaml
+  - namespaces/sample-apps.yaml
+
+  # RBAC baseline for platform
+  - rbac/platform-admin-roles.yaml
+  - rbac/breakglass-template.yaml
+
+  # Kyverno policies (policy-as-code)
+  - policies/kyverno/require-cost-labels.yaml
+  - policies/kyverno/require-resources.yaml
+  - policies/kyverno/pod-security-baseline.yaml
+  - policies/kyverno/block-latest-tag.yaml
+  - policies/kyverno/require-owner-label.yaml
+  - policies/kyverno/verify-slsa-provenance.yaml   # SLSA / cosign verification (prod) + EU CRA supply chain support
+
+  # Network policy defaults (applied to application namespaces via labels or separate)
+  - network/default-deny.yaml
+
+  # OpenCost configuration (values + deployment hints)
+  - opencost/opencost-namespace.yaml
+  - opencost/opencost-values.yaml   # Helm values reference; actual install via Helm or Flux HelmRelease
+
+  # Karpenter (example NodePools and NodeClasses)
+  - karpenter/nodepool-spot-general.yaml
+  - karpenter/nodepool-on-demand-critical.yaml
+
+  # Resource quotas for platform namespaces
+  - quotas/platform-quotas.yaml

@@ -1,0 +1,100 @@
+# .github/workflows/slsa-provenance.yml
+# SLSA provenance generation for the k8s-platform-blueprint repository and its release artifacts.
+# This supports the platform's aspiration to SLSA Level 2+ (and path to L3) and helps with
+# EU CRA secure SDLC + supply chain documentation obligations.
+#
+# Recommended production usage:
+#   - Use the official slsa-framework/slsa-github-generator reusable workflow for real builds.
+#   - Generate provenance for container images (using cosign + slsa generator), Helm charts,
+#     and Terraform module releases.
+#   - Store attestations in the OCI registry alongside images (or as GitHub attestations).
+#   - Verify at deploy time using the Kyverno policy manifests/clusters/policies/kyverno/verify-slsa-provenance.yaml.
+#
+# For the blueprint itself (docs, manifests, scripts): we generate repository-level provenance
+# on release. For real container builds in consuming projects, extend this pattern in your own
+# image build workflows.
+
+name: slsa-provenance
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  attestations: write
+
+jobs:
+  build-provenance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate SLSA provenance (using official generator pattern)
+        # For production image builds, prefer:
+        #   uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.0.0
+        #   with appropriate subject (the built artifact / image digest).
+        #
+        # This step produces a realistic in-toto statement for the repository content
+        # as an example. Replace/extend for your container image or chart builds.
+        id: provenance
+        run: |
+          echo "Generating SLSA provenance attestation for release ${{ github.ref }}..."
+          # In a real image build pipeline you would attest the actual image digest.
+          # Here we attest key repository artifacts for the blueprint release itself.
+          cat > provenance.intoto.jsonl << EOF
+          {
+            "_type": "https://in-toto.io/Statement/v1",
+            "subject": [
+              {
+                "name": "k8s-platform-blueprint",
+                "digest": {
+                  "sha256": "$(sha256sum README.md ARCHITECTURE.md | cut -d' ' -f1 | tr '\n' ' ' | sha256sum | cut -d' ' -f1)"
+                }
+              }
+            ],
+            "predicateType": "https://slsa.dev/provenance/v1",
+            "predicate": {
+              "buildDefinition": {
+                "buildType": "https://github.com/slsa-framework/slsa-github-generator/generic@v1",
+                "externalParameters": {
+                  "source": "${{ github.server_url }}/${{ github.repository }}@${{ github.ref }}"
+                },
+                "internalParameters": {},
+                "resolvedDependencies": []
+              },
+              "runDetails": {
+                "builder": {
+                  "id": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                },
+                "metadata": {
+                  "invocationId": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                }
+              }
+            }
+          }
+          EOF
+          echo "Provenance written to provenance.intoto.jsonl"
+          echo "For real container images: integrate cosign attest --predicate-type https://slsa.dev/provenance/v1 ..."
+
+      - name: Upload provenance artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: slsa-provenance
+          path: provenance.intoto.jsonl
+
+      # Optional: Use GitHub's native attestation (preferred for GitHub-hosted builds)
+      - name: Attest the generated provenance (GitHub native)
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: 'provenance.intoto.jsonl'
+
+  # Example job showing how you would attest a container image in a real platform build pipeline.
+  # Uncomment/adapt in your consuming projects' image-build workflows.
+  # build-and-attest-image:
+  #   # ... build step that produces an image ...
+  #   - name: Sign and attest image with SLSA provenance
+  #     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2
+  #     # Then verify with the Kyverno policy in prod.

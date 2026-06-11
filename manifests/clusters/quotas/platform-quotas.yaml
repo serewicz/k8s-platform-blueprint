@@ -1,0 +1,11 @@
+# manifests/clusters/quotas/platform-quotas.yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: platform-system-quota
+  namespace: platform-system
+spec:
+  hard:
+    requests.cpu: "50"
+    requests.memory: 100Gi
+    pods: "80"

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prod-platform
+  labels:
+    name: prod-platform
+    environment: prod
+    cost-center: platform-prod
+    team: platform-engineering
+    product: kubernetes-platform
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+  annotations:
+    cost.platform.blueprint/budget-monthly: "18500"
+    cost.platform.blueprint/owner: "platform-engineering"
+    description: "Production learner platform workloads - highest compliance posture"

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sample-apps
+  labels:
+    name: sample-apps
+    environment: platform
+    cost-center: platform-dev

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: opencost
+  labels:
+    name: opencost
+    environment: platform
+    cost-center: platform-observability

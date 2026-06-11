@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-platform
+  labels:
+    name: dev-platform
+    environment: dev
+    cost-center: platform-dev
+    team: platform-engineering
+    product: kubernetes-platform
+    pod-security.kubernetes.io/enforce: baseline
+  annotations:
+    cost.platform.blueprint/budget-monthly: "2500"
+    cost.platform.blueprint/owner: "platform-engineering"

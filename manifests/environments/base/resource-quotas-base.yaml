@@ -1,0 +1,8 @@
+# manifests/environments/base/resource-quotas-base.yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: base-tenant-quota
+spec:
+  hard:
+    pods: "200"

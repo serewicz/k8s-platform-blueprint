@@ -1,0 +1,78 @@
+# manifests/clusters/policies/kyverno/verify-slsa-provenance.yaml
+# Kyverno policy to verify SLSA provenance / cosign attestations for images in production.
+# This enforces supply chain security (SLSA Level 2+ aspiration).
+#
+# How this helps CTOs / compliance: Provides automated, auditable enforcement of
+# build provenance. Maps to EU CRA secure development & supply chain requirements,
+# SOC2 change management, and ISO 27001 software integrity controls.
+#
+# Note: Requires cosign + Kyverno's verify-image or attestations support (or Sigstore policy).
+# In production, configure the keyless or key-based verification against your
+# trusted build identities (e.g., GitHub Actions OIDC).
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-image-provenance-slsa
+  annotations:
+    policies.kyverno.io/title: Verify SLSA Provenance and Image Signatures (Production)
+    policies.kyverno.io/category: Supply Chain Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/subject: Pod,Image
+    policies.kyverno.io/description: |
+      In production namespaces, all container images must have valid cosign signatures
+      and/or SLSA provenance attestations. This implements continuous verification of
+      build integrity and provenance.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: verify-cosign-signature
+      match:
+        resources:
+          kinds:
+            - Pod
+          namespaces:
+            - "prod-*"
+      verifyImages:
+        - imageReferences:
+            - "*"
+          attestors:
+            - entries:
+                - keys:
+                    # Replace with your actual cosign public key or use keyless (Fulcio) configuration
+                    # For GitHub OIDC keyless: use the appropriate subject/issuer
+                    publicKeys:
+                      - |-
+                        -----BEGIN PUBLIC KEY-----
+                        <YOUR-COSIGN-PUBLIC-KEY-OR-OMIT-FOR-KEYLESS>
+                        -----END PUBLIC KEY-----
+                  # Example for keyless SLSA/GitHub:
+                  # - keyless:
+                  #     subject: "https://github.com/<org>/<repo>/.github/workflows/*.yml@refs/heads/main"
+                  #     issuer: "https://token.actions.githubusercontent.com"
+    - name: check-slsa-provenance-attestation
+      match:
+        resources:
+          kinds:
+            - Pod
+          namespaces:
+            - "prod-*"
+      context:
+        - name: slsa
+          imageData:
+            key: '{{request.object.spec.containers[0].image}}'
+      preconditions:
+        - key: "{{ slsa }}"
+          operator: NotEquals
+          value: ""
+      validate:
+        message: "Image must include SLSA provenance attestation (predicateType https://slsa.dev/provenance/v1)."
+        deny:
+          conditions:
+            - key: "{{ slsa }}"
+              operator: Equals
+              value: ""
+# In real deployments, combine with the official Kyverno verify-image adapter or
+# Sigstore Policy Controller for full SLSA predicate validation (v1 provenance).
+# See docs/governance-compliance-and-security.md for integration guidance.

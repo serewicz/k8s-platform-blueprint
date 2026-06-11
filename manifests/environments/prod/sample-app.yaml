@@ -1,0 +1,142 @@
+# manifests/environments/prod/sample-app.yaml
+# Production-grade sample deployment with full observability, PDB, and strict resources.
+# Replace image and add real config/secrets via External Secrets or sealed-secrets.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-learner-api
+  labels:
+    app.kubernetes.io/name: sample-learner-api
+    app.kubernetes.io/component: api
+    app.kubernetes.io/version: v0.4.2
+    cost-center: platform-prod
+    team: learner-platform
+    product: learner-experience
+    environment: prod
+spec:
+  replicas: 12
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sample-learner-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sample-learner-api
+        app.kubernetes.io/component: api
+        cost-center: platform-prod
+        team: learner-platform
+        product: learner-experience
+        environment: prod
+      annotations:
+        # OpenTelemetry / Prometheus scraping annotations
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: api
+          image: ghcr.io/your-org/sample-learner-api:v0.4.2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: ENV
+              value: "production"
+            - name: LOG_LEVEL
+              value: "info"
+            # In real usage: secrets injected via External Secrets Operator
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "384Mi"
+            limits:
+              cpu: "1000m"
+              memory: "768Mi"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 8
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-learner-api
+  labels:
+    app.kubernetes.io/name: sample-learner-api
+spec:
+  selector:
+    app.kubernetes.io/name: sample-learner-api
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: http
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sample-learner-api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sample-learner-api
+  minReplicas: 6
+  maxReplicas: 120
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 55
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 65
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 45
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 30
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+---
+# Production PDB - prevents voluntary disruption below this threshold
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: sample-learner-api
+spec:
+  minAvailable: 4
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sample-learner-api

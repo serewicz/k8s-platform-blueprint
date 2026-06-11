@@ -1,0 +1,31 @@
+# manifests/clusters/karpenter/nodepool-on-demand-critical.yaml
+# Small pool of reliable on-demand capacity for critical system components,
+# control-plane adjacent workloads, and latency-sensitive services.
+
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: on-demand-critical
+spec:
+  disruption:
+    consolidationPolicy: WhenEmpty
+    expireAfter: 720h  # 30 days
+  template:
+    metadata:
+      labels:
+        node.kubernetes.io/capacity-type: on-demand
+        node-pool: on-demand-critical
+    spec:
+      requirements:
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["on-demand"]
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: ["c", "m"]
+      nodeClassRef:
+        name: default
+  limits:
+    cpu: "200"
+    memory: 800Gi
+  weight: 50   # Higher weight = preferred for critical pods that tolerate it

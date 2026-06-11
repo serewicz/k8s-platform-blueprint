@@ -1,0 +1,22 @@
+# manifests/clusters/namespaces/platform-system.yaml
+# Dedicated namespace for platform control-plane components.
+# High privilege; strict RBAC and network controls apply.
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: platform-system
+  labels:
+    name: platform-system
+    environment: platform
+    cost-center: platform-infra
+    team: platform-engineering
+    product: kubernetes-platform
+    # This namespace is exempt from many tenant policies
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+  annotations:
+    description: "Core platform control plane (GitOps, policy, autoscalers, etc.)"
+    cost.platform.blueprint/budget-monthly: "15000"
+    cost.platform.blueprint/owner: "platform-engineering"

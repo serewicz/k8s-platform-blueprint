@@ -1,0 +1,19 @@
+# manifests/clusters/namespaces/monitoring.yaml
+# Observability stack namespace. Receives metrics, logs, traces from all workloads.
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+  labels:
+    name: monitoring
+    environment: platform
+    cost-center: platform-observability
+    team: platform-engineering
+    product: kubernetes-platform
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/audit: restricted
+  annotations:
+    description: "Prometheus, Grafana, Loki, Alertmanager, OTel collectors"
+    cost.platform.blueprint/budget-monthly: "8000"
+    cost.platform.blueprint/owner: "platform-engineering"

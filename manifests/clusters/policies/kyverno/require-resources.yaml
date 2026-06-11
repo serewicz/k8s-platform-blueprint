@@ -1,0 +1,50 @@
+# manifests/clusters/policies/kyverno/require-resources.yaml
+# Requires CPU and memory requests + limits on every container.
+# Prevents noisy neighbor problems and enables accurate cost accounting.
+#
+# How this helps CTOs: Accurate right-sizing data and cost-per-workload metrics
+# depend on requests/limits being present and realistic.
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-resource-requests-limits
+  annotations:
+    policies.kyverno.io/title: Require Resource Requests and Limits
+    policies.kyverno.io/category: Cost & Reliability
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/subject: Pod
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-requests-limits
+      match:
+        resources:
+          kinds:
+            - Pod
+          namespaces:
+            - "!kube-system"
+            - "!kyverno"
+            - "!platform-system"
+      validate:
+        message: "Every container must specify both requests and limits for CPU and memory."
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  requests:
+                    memory: "?*"
+                    cpu: "?*"
+                  limits:
+                    memory: "?*"
+                    cpu: "?*"
+            # Init containers also recommended
+            initContainers:
+              - resources:
+                  requests:
+                    memory: "?*"
+                    cpu: "?*"
+                  limits:
+                    memory: "?*"
+                    cpu: "?*"

@@ -1,0 +1,33 @@
+# manifests/environments/prod/quotas/prod-quotas.yaml
+# Production quotas — strict, with explicit budget alignment.
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: prod-tenant-quota
+  namespace: prod-platform
+spec:
+  hard:
+    requests.cpu: "400"
+    requests.memory: 1200Gi
+    limits.cpu: "900"
+    limits.memory: 2400Gi
+    pods: "400"
+    services: "120"
+    persistentvolumeclaims: "80"
+  # In real usage you can also use LimitRanges for defaults
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: prod-defaults
+  namespace: prod-platform
+spec:
+  limits:
+    - default:
+        cpu: "500m"
+        memory: "512Mi"
+      defaultRequest:
+        cpu: "100m"
+        memory: "128Mi"
+      type: Container

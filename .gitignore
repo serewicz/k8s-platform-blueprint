@@ -1,0 +1,122 @@
+# k8s-platform-blueprint .gitignore
+# Production-grade ignore patterns for Kubernetes platform reference architecture
+
+# Binaries and build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+bin/
+build/
+dist/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.lock.hcl
+.terraform.tfstate.lock.info
+
+# Crossplane / provider configs
+*.crossplane.yaml
+
+# Kubernetes / manifests generated or sensitive
+*.kubeconfig
+kubeconfig*
+!examples/**/kubeconfig.example
+manifests/**/secrets/
+!manifests/**/secrets/*.example.yaml
+*.secret.yaml
+*-secret.yaml
+
+# Helm
+charts/*/charts/
+charts/*/Chart.lock
+
+# Scripts / local outputs
+scripts/output/
+scripts/logs/
+*.log
+cost-report-*.csv
+compliance-report-*.json
+scaling-test-*.json
+
+# IDE and editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Environment and local config
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+id_rsa*
+ssh-*
+*.crt
+*.p12
+
+# Python / tooling
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node (if any tooling)
+node_modules/
+npm-debug.log*
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Temporary and test artifacts
+tmp/
+temp/
+*.tmp
+test-results/
+coverage/
+.nyc_output/
+
+# Kind / minikube local clusters
+kind-*.yaml
+minikube-*.yaml
+
+# SLSA / provenance artifacts (generated)
+*.intoto.jsonl
+provenance-*.json
+
+# Backup and autosave
+*~
+*.bak

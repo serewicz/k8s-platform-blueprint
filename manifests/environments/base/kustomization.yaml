@@ -1,0 +1,10 @@
+# manifests/environments/base/kustomization.yaml
+# Common base resources shared across dev/staging/prod via Kustomize.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - network-policies.yaml
+  - pod-disruption-budgets.yaml
+  - resource-quotas-base.yaml

@@ -1,0 +1,17 @@
+# manifests/clusters/rbac/breakglass-template.yaml
+# Template / example for time-limited elevated access.
+# In production this would be created by automation with justification ticket + TTL.
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: breakglass-platform-admin
+  annotations:
+    description: "Time-boxed break-glass ClusterRoleBinding. Must be cleaned up after use. See incident runbook."
+subjects:
+  - kind: User
+    name: breakglass-user@example.com
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,66 @@
+# .github/workflows/ci-validate.yml
+# Primary CI workflow for the k8s-platform-blueprint.
+# Runs on every push and PR.
+#
+# Gates:
+#   - Manifest + policy validation
+#   - Kustomize builds
+#   - Basic linting
+#   - Cost simulation smoke test
+#   - Compliance report generation (artifact)
+
+name: ci-validate
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup tools
+        uses: ./.github/actions/setup-tools
+        # Fallback inline if composite action not present
+        # (we define a simple step list below for robustness)
+
+      - name: Install kustomize
+        uses: imranismail/setup-kustomize@v2
+        with:
+          kustomize-version: "5.4.1"
+
+      - name: Install helm
+        uses: azure/setup-helm@v4
+        with:
+          version: '3.14.4'
+
+      - name: Run repository validation
+        run: |
+          ./scripts/validate.sh
+
+      - name: Run cost simulation (smoke)
+        run: |
+          ./scripts/cost-simulation.sh --scenario education-platform --nodes 40 --output-format json > /tmp/cost-smoke.json
+          cat /tmp/cost-smoke.json
+
+      - name: Generate compliance report artifact
+        run: |
+          ./scripts/compliance-scan.sh --framework soc2 --output /tmp/compliance-report.json
+          cp /tmp/compliance-report.* . || true
+
+      - name: Upload compliance artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: compliance-reports
+          path: |
+            compliance-report-*.json
+            compliance-report-*.md
+          retention-days: 30
+
+      - name: Verify no obvious secrets in manifests
+        run: |
+          ! grep -r -i "password\|secret\|token" --include="*.yaml" manifests/ | grep -v "example\|placeholder\|CHANGE" || (echo "Potential secret material found in manifests" && exit 1)

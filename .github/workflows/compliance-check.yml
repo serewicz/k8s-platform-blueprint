@@ -1,0 +1,39 @@
+# .github/workflows/compliance-check.yml
+# Nightly or on-demand compliance + security posture checks.
+# Produces reports that can be consumed by GRC tools or attached to release evidence packages.
+
+name: compliance-check
+
+on:
+  schedule:
+    - cron: '17 3 * * *'   # Nightly at ~03:17 UTC
+  workflow_dispatch:
+
+jobs:
+  compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          curl -sL https://github.com/kyverno/kyverno/releases/download/v1.12.1/kyverno-cli_v1.12.1_linux_x86_64.tar.gz | tar xz
+          sudo mv kyverno /usr/local/bin/
+
+      - name: Run compliance scan
+        run: |
+          ./scripts/compliance-scan.sh --framework all --output compliance-nightly.json
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-compliance
+          path: |
+            compliance-nightly.*
+          retention-days: 90
+
+      - name: Summary for PRs / issues (on dispatch)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "Compliance report generated. See artifacts."
+          cat compliance-nightly.md || true

@@ -1,0 +1,12 @@
+# manifests/clusters/opencost/opencost-values.yaml
+# Reference Helm values for OpenCost.
+# In real GitOps use a Flux HelmRelease or Argo Application that references these values.
+
+opencost:
+  exporter:
+    defaultClusterId: "blueprint-cluster"
+  prometheus:
+    internal: true
+  cloudCost:
+    enabled: true
+  # Add CUR / billing export configuration per cloud in production

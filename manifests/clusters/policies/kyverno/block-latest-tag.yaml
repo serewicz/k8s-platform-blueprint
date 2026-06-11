@@ -1,0 +1,31 @@
+# manifests/clusters/policies/kyverno/block-latest-tag.yaml
+# Production safety: block use of :latest tag in prod environments.
+# Encourages immutable image tags + reproducible deployments.
+
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: block-latest-image-tag-prod
+  annotations:
+    policies.kyverno.io/title: Block :latest Tag in Production
+    policies.kyverno.io/category: Supply Chain
+    policies.kyverno.io/severity: medium
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: block-latest
+      match:
+        resources:
+          kinds:
+            - Pod
+          namespaces:
+            - "prod-*"
+      validate:
+        message: "Image tag ':latest' is not allowed in production. Use immutable tags."
+        pattern:
+          spec:
+            containers:
+              - image: "!*:latest"
+            initContainers:
+              - image: "!*:latest"
