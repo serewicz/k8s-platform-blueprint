@@ -1,32 +1,26 @@
 # k8s-platform-blueprint
 
-**Strategic Kubernetes Platform Reference Architecture**
+**Executive-grade Kubernetes platform governance reference architecture**
 
-[![Kubernetes](https://img.shields.io/badge/Kubernetes-1.28%2B-326CE5?logo=kubernetes&logoColor=white)](https://kubernetes.io)
-[![OpenCost](https://img.shields.io/badge/OpenCost-FinOps-FF6B35)](https://www.opencost.io)
-[![Kyverno](https://img.shields.io/badge/Kyverno-Policy--as--Code-4B9CD3)](https://kyverno.io)
-[![Prometheus](https://img.shields.io/badge/Prometheus-Observability-E6522C?logo=prometheus&logoColor=white)](https://prometheus.io)
-[![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?logo=grafana&logoColor=white)](https://grafana.com)
-[![Terraform](https://img.shields.io/badge/Terraform-Multi--Cloud-7B42BC?logo=terraform&logoColor=white)](https://www.terraform.io)
-[![GitOps](https://img.shields.io/badge/GitOps-Flux%20%2F%20ArgoCD-2E8B57)](https://fluxcd.io)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![SLSA](https://img.shields.io/badge/SLSA-Level%202%2B-2C3E50)](https://slsa.dev)
+This repository shows how a Kubernetes platform can be governed as a business capability, not only operated as infrastructure. It connects platform architecture to cost visibility, security controls, compliance evidence, observability, developer productivity, and executive reporting.
 
-> **For CTOs, Platform Engineering Leads, and Technical Executives**  
-> Production-grade patterns for cost optimization, governance, compliance, scaling, observability, and hybrid/multi-cloud Kubernetes — informed by real-world platforms serving hundreds of thousands of global learners.
+It is written for CTOs, operating partners, platform leaders, security leaders, and diligence teams who need to understand whether Kubernetes is reducing business risk or quietly becoming an expensive, opaque operating dependency.
 
 ---
 
 ## Table of Contents
 
 - [Executive Summary & Business Impact](#executive-summary--business-impact)
+- [What This Repo Is](#what-this-repo-is)
 - [Who This Is For](#who-this-is-for)
+- [Why Kubernetes Governance Matters](#why-kubernetes-governance-matters)
 - [Architecture Overview](#architecture-overview)
 - [Key Capabilities](#key-capabilities)
 - [Quickstart (Local Reproduction)](#quickstart-local-reproduction)
 - [Repository Structure](#repository-structure)
 - [CTO Dashboard & ROI Highlights](#cto-dashboard--roi-highlights)
 - [Documentation](#documentation)
+- [Related Projects](#related-projects)
 - [Real-World Applicability: Education & Training Platforms](#real-world-applicability-education--training-platforms)
 - [Contributing & Governance](#contributing--governance)
 - [License](#license)
@@ -35,25 +29,70 @@
 
 ## Executive Summary & Business Impact
 
-This repository provides a **battle-tested, executive-ready reference architecture** for building and operating a strategic Kubernetes platform. It directly addresses the concerns that matter most at the C-level:
+This repository provides an executive-ready reference architecture for building and operating a governed Kubernetes platform. It is designed to help leadership teams answer:
 
-- **Cost Control & FinOps**: Transparent unit economics, chargeback/showback, idle cost elimination, and predictable multi-cloud spend. Includes OpenCost integration + Kubecost-like patterns + simulation tooling.
-- **Risk & Compliance**: Policy-as-code (Kyverno + OPA examples) mapped to SOC 2, ISO 27001, and similar frameworks. Automated evidence generation for audits and board reporting.
-- **Scalability & Resilience**: Patterns proven at global scale (hundreds of thousands of concurrent learners, multi-region). Karpenter + HPA/VPA, GitOps, service mesh options, and hybrid connectivity.
-- **Observability & Executive Visibility**: Pre-built Grafana dashboards for cluster health, application SLAs, cost-per-tenant, risk heatmaps, and ROI aggregation. CTO-level views that translate technical metrics into business outcomes.
-- **Strategic Alignment**: Every major decision includes "How this helps CTOs" guidance — linking technology choices to risk reduction, capital efficiency, speed-to-market, and defensibility.
+- What does the platform cost, and who is accountable for that spend?
+- Which controls prove that workloads meet security and compliance expectations?
+- Can engineering teams deploy safely without central bottlenecks?
+- Can executives see reliability, risk, spend, and delivery trends in one operating model?
+- Is the platform ready for diligence, audit, scale, or post-acquisition integration?
+
+Business outcomes this blueprint supports:
+
+- **Cost visibility** through OpenCost/Kubecost-style allocation, showback, chargeback, idle capacity tracking, and unit economics.
+- **Platform governance** through GitOps, ownership labels, namespace standards, platform policies, and maturity models.
+- **Security controls** through policy-as-code, RBAC, network policies, admission controls, image provenance, and break-glass procedures.
+- **Observability** through metrics, logs, traces, SLOs, reliability trends, and executive dashboard views.
+- **Compliance evidence** through audit logs, policy reports, deployment history, and evidence packages.
+- **Developer productivity** through standardized environments, self-service deployment patterns, reusable platform services, and clear operating boundaries.
+- **Executive reporting** through board-ready views of spend, risk, reliability, policy exceptions, and delivery health.
 
 **Primary Goal**: Give technical executives a production-grade blueprint they can use for strategy, vendor evaluation, internal platform builds, due diligence, and board-level communication.
+
+---
+
+## What This Repo Is
+
+This is a platform governance reference architecture for Kubernetes. It combines executive operating models, documentation, local examples, Kubernetes manifests, policy examples, cost-management patterns, observability guidance, and infrastructure templates.
+
+It is not a productized platform distribution. Use it as a blueprint for evaluating or designing a governed internal developer platform.
 
 ---
 
 ## Who This Is For
 
 - **CTOs and VP Engineering**: Strategic oversight, ROI modeling, risk posture, and technology-business alignment.
+- **CEOs and Boards**: Business visibility into infrastructure risk, cost, compliance, and platform readiness.
+- **PE Operating Partners and Investors**: Diligence mapping, post-close risk reduction, and portfolio company platform governance.
 - **Platform Engineering Leads**: Reference implementation for internal developer platforms (IDPs).
 - **Infrastructure & FinOps Teams**: Cost accountability, multi-cloud governance, and optimization playbooks.
 - **Security & Compliance Officers**: Policy-as-code, audit readiness, and automated controls.
 - **Enterprise Architects**: Hybrid/multi-cloud patterns and long-term platform evolution.
+
+---
+
+## Why Kubernetes Governance Matters
+
+Kubernetes creates leverage when it standardizes deployment, scaling, policy, and observability. It creates risk when ownership, cost, security, and compliance evidence are left implicit.
+
+Common executive failure modes include:
+
+- no clear cost allocation by product, customer, environment, or team
+- inconsistent workload ownership
+- weak admission controls and policy enforcement
+- limited audit evidence for deployments and access
+- unmonitored reliability trends
+- platform teams becoming manual approval bottlenecks
+- AI and GPU workloads appearing without spend attribution or data controls
+
+The governance goal is not more bureaucracy. The goal is to make ownership, tradeoffs, risk, controls, and outcomes explicit.
+
+```mermaid
+flowchart LR
+    A["Platform Inputs<br/>Workloads, teams, spend, risk"] --> B["Governance Controls<br/>GitOps, policy, labels, RBAC"]
+    B --> C["Operational Evidence<br/>cost reports, policy reports, logs, SLOs"]
+    C --> D["Executive Decisions<br/>investment, risk, roadmap, accountability"]
+```
 
 ---
 
@@ -292,6 +331,10 @@ Full details and dashboard JSONs: [docs/cto-dashboard-and-roi.md](docs/cto-dashb
 | Document | Purpose |
 |----------|---------|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Decision records, trade-offs, control plane diagrams, evolution roadmap |
+| [docs/platform-governance-maturity-model.md](docs/platform-governance-maturity-model.md) | Five-level maturity model from basic Kubernetes to board-ready platform |
+| [docs/finops-and-executive-dashboards.md](docs/finops-and-executive-dashboards.md) | FinOps operating model, dashboard views, showback, chargeback, and executive metrics |
+| [docs/technology-due-diligence-mapping.md](docs/technology-due-diligence-mapping.md) | Maps diligence findings to platform controls, evidence, and remediation patterns |
+| [docs/ai-infrastructure-governance.md](docs/ai-infrastructure-governance.md) | Governance model for AI workloads, GPU spend, model deployment, isolation, and auditability |
 | [docs/cost-optimization-and-finops.md](docs/cost-optimization-and-finops.md) | OpenCost, Karpenter, quotas, chargeback, multi-cloud billing |
 | [docs/governance-compliance-and-security.md](docs/governance-compliance-and-security.md) | Kyverno/OPA, RBAC, network policies, SOC2/ISO mapping, audit automation |
 | [docs/hybrid-cloud.md](docs/hybrid-cloud.md) | EKS + GKE + AKS + on-prem patterns, connectivity, workload portability |
@@ -299,6 +342,19 @@ Full details and dashboard JSONs: [docs/cto-dashboard-and-roi.md](docs/cto-dashb
 | [docs/metrics-monitoring-and-observability.md](docs/metrics-monitoring-and-observability.md) | Full observability stack, custom metrics, SLOs |
 | [docs/cto-dashboard-and-roi.md](docs/cto-dashboard-and-roi.md) | Executive dashboards, ROI modeling, board reporting templates |
 | [docs/lessons-learned.md](docs/lessons-learned.md) | Real production pitfalls, migration stories, organizational patterns |
+
+---
+
+## Related Projects
+
+- [CTO Operating System](https://github.com/serewicz/cto-operating-system): defines the CTO and operating-partner methodology, frameworks, templates, governance models, and diligence operating model.
+- [Executive AI Advisor](https://github.com/serewicz/Executive-AI-Advisor): analyzes diligence documents and generates cited outputs such as technology diligence reports, risk heatmaps, board briefs, CRA readiness assessments, and 100-day plans.
+
+How they fit together:
+
+- CTO Operating System defines the methodology.
+- Executive AI Advisor analyzes documents and generates diligence outputs.
+- K8s Platform Blueprint provides implementation patterns for platform governance, FinOps, observability, AI infrastructure governance, and Kubernetes controls.
 
 ---
 
