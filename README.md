@@ -341,6 +341,7 @@ Full details and dashboard JSONs: [docs/cto-dashboard-and-roi.md](docs/cto-dashb
 | [docs/finops-and-executive-dashboards.md](docs/finops-and-executive-dashboards.md) | FinOps operating model, dashboard views, showback, chargeback, and executive metrics |
 | [docs/technology-due-diligence-mapping.md](docs/technology-due-diligence-mapping.md) | Maps diligence findings to platform controls, evidence, and remediation patterns |
 | [docs/ai-infrastructure-governance.md](docs/ai-infrastructure-governance.md) | Governance model for AI workloads, GPU spend, model deployment, isolation, and auditability |
+| [docs/ai-knowledge-platform-architecture.md](docs/ai-knowledge-platform-architecture.md) | AI Knowledge Platform Architecture: implementation reference for governed enterprise AI knowledge platforms using data lakes, enterprise search, RAG, vector retrieval, private endpoints, local SLMs, policy controls, audit logging, observability, and cost governance |
 | [docs/cost-optimization-and-finops.md](docs/cost-optimization-and-finops.md) | OpenCost, Karpenter, quotas, chargeback, multi-cloud billing |
 | [docs/governance-compliance-and-security.md](docs/governance-compliance-and-security.md) | Kyverno/OPA, RBAC, network policies, SOC2/ISO mapping, audit automation |
 | [docs/hybrid-cloud.md](docs/hybrid-cloud.md) | EKS + GKE + AKS + on-prem patterns, connectivity, workload portability |
