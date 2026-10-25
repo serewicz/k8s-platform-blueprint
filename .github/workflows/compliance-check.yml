@@ -13,7 +13,7 @@ jobs:
   compliance:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install tools
         run: |
@@ -25,7 +25,7 @@ jobs:
           ./scripts/compliance-scan.sh --framework all --output compliance-nightly.json
 
       - name: Upload reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nightly-compliance
           path: |
